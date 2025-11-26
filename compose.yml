@@ -1,0 +1,42 @@
+services:
+  streamers-leveling:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: streamers-leveling-back
+    image: streamers-leveling:0.0.1
+    ports:
+      - "${TEST_PORT}:${TEST_PORT}"
+    environment:
+      - PORT=${TEST_PORT}
+      - NODE_ENV=development
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      - streamers-leveling-DB
+    networks:
+      - streamers-network
+
+  streamers-leveling-DB:
+    image: postgres:18-alpine
+    restart: always
+    shm_size: 128mb
+    container_name: streamers-leveling-DB
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD_ROOT}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - streamers_db_data:/var/lib/postgresql
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    networks:
+      - streamers-network
+
+volumes:
+  streamers_db_data:
+    name: "streamers_db_data"
+
+networks:
+  streamers-network:
+    driver: bridge
