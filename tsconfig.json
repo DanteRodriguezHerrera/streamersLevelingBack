@@ -1,4 +1,11 @@
 {
+  "watchOptions": {
+    "watchFile": "priorityPollingInterval",
+    "watchDirectory": "dynamicprioritypolling",
+    "fallbackPolling": "dynamicPriority",
+    "synchronousWatchDirectory": true,
+    "excludeDirectories": ["**/node_modules", "dist"]
+  },
   "compilerOptions": {
     "module": "nodenext",
     "moduleResolution": "nodenext",

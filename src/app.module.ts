@@ -6,6 +6,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { ConfigModule } from '@nestjs/config';
 
 import { User } from './resources/users/entities/user.entity';
+import { GroupsModule } from './resources/groups/groups.module';
+import { Group } from './resources/groups/entities/group.entity';
 
 @Module({
   imports: [
@@ -18,10 +20,12 @@ import { User } from './resources/users/entities/user.entity';
       password: process.env.DB_PASSWORD_ROOT,
       database: process.env.DB_NAME,
       models: [
-        User
+        User,
+        Group
       ]
     }),
-    UsersModule
+    UsersModule,
+    GroupsModule
   ],
   controllers: [AppController],
   providers: [AppService],

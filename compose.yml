@@ -7,6 +7,8 @@ services:
     image: streamers-leveling:0.0.1
     ports:
       - "${TEST_PORT}:${TEST_PORT}"
+    env_file: 
+      - .env
     environment:
       - PORT=${TEST_PORT}
       - NODE_ENV=development

@@ -1,7 +1,39 @@
-node_modules
-test
+# Optimized .dockerignore for Node.js + React Todo App
+# Based on actual project structure
+
+# Version control
+.git/
+.github/
 .gitignore
-.gitignore
-.prettier
-Dockerfile
-Dockerfile.prod
+
+# Dependencies (installed in container)
+node_modules/
+
+# Build outputs (built in container)
+dist/
+
+# Environment files
+.env*
+
+# Development files
+.vscode/
+*.log
+coverage/
+.eslintcache
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+docs/
+
+# Deployment configs
+compose.yml
+Taskfile.yml
+nodejs-sample-kubernetes.yaml
+
+# Non-essential configs (keep build configs)
+*.config.js
+!tsconfig.json

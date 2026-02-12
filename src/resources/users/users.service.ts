@@ -5,20 +5,49 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { v4 as uuid } from 'uuid';
 
 import { User } from './entities/user.entity';
+import { IUser } from 'src/interfaces/users.interfaces';
+import { Group } from '../groups/entities/group.entity';
+import { GroupsService } from '../groups/groups.service';
+import { GroupResponse, IGroup } from 'src/interfaces/groups.interfaces';
 
 @Injectable()
 export class UsersService {
 
   constructor (
-    @Inject('USERS_REPOSITORY')
-    private readonly  usersRepository: typeof User,
+    @Inject('USERS_REPOSITORY') private readonly  usersRepository: typeof User,
+    @Inject('GROUPS_REPOSITORY') private readonly groupsRepository: typeof Group,
+    private groupsService: GroupsService
   ) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
-      const newUser = {
+      let newUser: IUser = {
         user_id: uuid(),
         ...createUserDto
+      }
+
+      const groups: IGroup[] = await this.groupsRepository.findAll();
+
+      if(groups.length == 0) {
+        const newGroup: GroupResponse = await this.groupsService.create();
+        newUser.group_id = newGroup.data.group_id
+      }
+      else {
+        for (let i = 0; i < groups.length; i++) {
+          const { count } = await this.usersRepository.findAndCountAll({
+            where: {
+              group_id: groups[i].group_id
+            }
+          })
+          if(count < 50) {
+            newUser.group_id = groups[i].group_id;
+            break;
+          }
+          else {
+            const newGroup: GroupResponse = await this.groupsService.create();
+            newUser.group_id = newGroup.data.group_id
+          }
+        }
       }
 
       const user = await this.usersRepository.create(newUser);
@@ -85,19 +114,47 @@ export class UsersService {
     }
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(user_id: string, updateUserDto: UpdateUserDto) {
     try {
-
+      const user = await this.usersRepository.findByPk(user_id);
+      if(!user) {
+        return {
+          message: 'No existe el usuario',
+          status: HttpStatus.NOT_FOUND
+        }
+      }
+      await user.update(updateUserDto);
+      return {
+        status: HttpStatus.OK,
+        message: "Usuario actualizado correctamente",
+        data: user
+      }
     } catch (error) {
-
+      return {
+        error
+      }
     }
   }
 
-  async remove(id: string) {
+  async remove(user_id: string) {
     try {
-
+      const user = await this.usersRepository.findByPk(user_id);
+      if(!user) {
+        return {
+          message: 'No existe el usuario',
+          status: HttpStatus.NOT_FOUND
+        }
+      }
+      await user.destroy();
+      return {
+        status: HttpStatus.OK,
+        message: `Usuario con id ${user_id} ha sido eliminado correctamente`,
+        data: user
+      }
     } catch (error) {
-
+      return {
+        error
+      }
     }
   }
 }
