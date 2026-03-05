@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { v4 as uuid } from 'uuid';
 
 import { User } from './entities/user.entity';
-import { IUser } from 'src/interfaces/users.interfaces';
+import { IUser, UserResponse, UsersResponse } from 'src/interfaces/users.interfaces';
 import { Group } from '../groups/entities/group.entity';
 import { GroupsService } from '../groups/groups.service';
 import { GroupResponse, IGroup } from 'src/interfaces/groups.interfaces';
@@ -19,11 +19,11 @@ export class UsersService {
     private groupsService: GroupsService
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto) : Promise<UserResponse> {
     try {
       let newUser: IUser = {
         user_id: uuid(),
-        ...createUserDto
+        ...createUserDto,
       }
 
       const groups: IGroup[] = await this.groupsRepository.findAll();
@@ -50,35 +50,47 @@ export class UsersService {
         }
       }
 
-      const user = await this.usersRepository.create(newUser);
+      const user: IUser = await this.usersRepository.create(newUser);
 
       return {
         message: 'Nuevo usuario de twitch registrado',
-        data: user
+        data: user,
+        status: HttpStatus.OK
       }
     } catch (error) {
       return {
-        error
+        message: 'Ocurrió un error registrando el usuario',
+        status: HttpStatus.BAD_REQUEST,
+        data: error
       }
     }
   }
 
-  async findAll() {
+  async findAll() : Promise<UsersResponse> {
     try {
       const users = await this.usersRepository.findAll()
-      if(!users) return { message: 'No se encontraron usuarios' }
+      
+      if(!users) return { 
+        message: 'No se encontraron usuarios',
+        data: [],
+        status: HttpStatus.NOT_FOUND
+      }
+
       return {
         message: 'Se encontraron correctamente todos los usuarios',
-        data: users
+        data: users,
+        status: HttpStatus.OK
       }
     } catch (error) {
       return {
-        error
+        message: 'Ocurrió un error al encontrar los usuarios',
+        status: HttpStatus.BAD_REQUEST,
+        data: error
       }
     }
   }
 
-  async findOne(user_id: string) {
+  async findOne(user_id: string) : Promise<UserResponse> {
 
     //   async getUser() {
 
@@ -93,33 +105,51 @@ export class UsersService {
     // }
 
     try {
-      const user = await this.usersRepository.findOne({
-        where: {
-          twitch_id: user_id
-        }
-      })
+      const user = await this.usersRepository.findByPk(user_id)
       if(!user) return { 
-        status: HttpStatus.NO_CONTENT,
         message: "Usuario no registrado",
+        status: HttpStatus.NO_CONTENT,
+        data: {
+          user_id: '',
+          twitch_id: '',
+          role_id: '',
+          group_id: null,
+          access_token: '',
+          expires_in: 0,
+          refresh_token: '',
+          actual_money: 0
+        }
       }
       return {
-        status: HttpStatus.CREATED,
         message: "Usuario encontrado correctamente",
-        data: user
+        data: user,
+        status: HttpStatus.CREATED,
       }
     } catch (error) {
       return {
-        error
+        message: "Ocurrió un error buscando al usuario",
+        data: error,
+        status: HttpStatus.CREATED,
       }
     }
   }
 
-  async update(user_id: string, updateUserDto: UpdateUserDto) {
+  async update(user_id: string, updateUserDto: UpdateUserDto) : Promise<UserResponse> {
     try {
       const user = await this.usersRepository.findByPk(user_id);
       if(!user) {
         return {
           message: 'No existe el usuario',
+          data: {
+            user_id: '',
+            twitch_id: '',
+            role_id: '',
+            group_id: null,
+            access_token: '',
+            expires_in: 0,
+            refresh_token: '',
+            actual_money: 0
+          },
           status: HttpStatus.NOT_FOUND
         }
       }
@@ -131,18 +161,30 @@ export class UsersService {
       }
     } catch (error) {
       return {
-        error
+        message: 'Ocurrió un error al actualizar al usuario',
+        status: HttpStatus.BAD_REQUEST,
+        data: error
       }
     }
   }
 
-  async remove(user_id: string) {
+  async remove(user_id: string) : Promise<UserResponse> {
     try {
       const user = await this.usersRepository.findByPk(user_id);
       if(!user) {
         return {
           message: 'No existe el usuario',
-          status: HttpStatus.NOT_FOUND
+          status: HttpStatus.NOT_FOUND,
+          data: {
+            user_id: '',
+            twitch_id: '',
+            role_id: '',
+            group_id: null,
+            access_token: '',
+            expires_in: 0,
+            refresh_token: '',
+            actual_money: 0
+          },
         }
       }
       await user.destroy();
@@ -153,8 +195,14 @@ export class UsersService {
       }
     } catch (error) {
       return {
-        error
+        message: 'Ocurrió un error al eliminar el usuario',
+        status: HttpStatus.BAD_REQUEST,
+        data: error
       }
     }
+  }
+
+  async findUser() {
+
   }
 }

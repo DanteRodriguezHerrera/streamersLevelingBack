@@ -6,7 +6,13 @@ export type IGroup = {
 }
 
 export interface GroupResponse {
-    message: string,
-    data: IGroup,
-    status: HttpStatus
+    message: string;
+    data: IGroup;
+    status: HttpStatus;
+}
+
+export interface GroupsResponse {
+    message: string;
+    data: IGroup[];
+    status: HttpStatus;
 }

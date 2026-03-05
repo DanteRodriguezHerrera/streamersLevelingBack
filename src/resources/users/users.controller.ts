@@ -12,13 +12,13 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Get('all')
+  @Get('')
   findAll() {
     return this.usersService.findAll();
   }
 
-  @Get()
-  findOne(@Query('user_id') user_id: string) {
+  @Get(':user_id')
+  findOne(@Param('user_id') user_id: string) {
     return this.usersService.findOne(user_id);
   }
 

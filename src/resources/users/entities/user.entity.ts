@@ -48,4 +48,16 @@ export class User extends Model {
         allowNull: false
     })
     declare refresh_token: string;
+
+    @Column({
+        type: DataType.SMALLINT,
+        allowNull: false
+    })
+    declare actual_money: number;
+
+    @Column({
+        type: DataType.STRING({ length : 255 }),
+        allowNull: false
+    })
+    declare channel_name: string;
 }

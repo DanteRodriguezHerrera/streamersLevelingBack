@@ -24,4 +24,12 @@ export class CreateUserDto {
     @IsNotEmpty({ message: 'El refresh_token no debe estar vacío' })
     @IsString({ message: 'El refresh_token debe ser un número' })
     refresh_token: string;
+
+    @IsNotEmpty({ message: 'El dinero actual no debe estar vacío'})
+    @IsNumber({}, { message: 'El dinero actual del usuario debe ser un número' })
+    actual_money: number;
+
+    @IsNotEmpty({ message: 'El nombre del canal no debe estar vacío'})
+    @IsString({ message: 'El nombre del canal debe ser un texto' })
+    channel_name: string;
 }
