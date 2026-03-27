@@ -10,6 +10,12 @@ import { GroupsModule } from './resources/groups/groups.module';
 import { Group } from './resources/groups/entities/group.entity';
 import { MoneyHistoryModule } from './resources/money_history/money_history.module';
 import { MoneyHistory } from './resources/money_history/entities/money_history.entity';
+import { DaysModule } from './resources/days/days.module';
+import { HoursModule } from './resources/hours/hours.module';
+import { AgendaModule } from './resources/agenda/agenda.module';
+import { Day } from './resources/days/entities/day.entity';
+import { Hour } from './resources/hours/entities/hour.entity';
+import { Agenda } from './resources/agenda/entities/agenda.entity';
 
 @Module({
   imports: [
@@ -24,12 +30,18 @@ import { MoneyHistory } from './resources/money_history/entities/money_history.e
       models: [
         User,
         Group,
-        MoneyHistory
+        MoneyHistory,
+        Day,
+        Hour,
+        Agenda
       ]
     }),
     UsersModule,
     GroupsModule,
-    MoneyHistoryModule
+    MoneyHistoryModule,
+    DaysModule,
+    HoursModule,
+    AgendaModule
   ],
   controllers: [AppController],
   providers: [AppService],
