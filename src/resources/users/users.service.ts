@@ -26,6 +26,9 @@ export class UsersService {
         ...createUserDto,
       }
 
+      newUser.role_id = 'c3f283bf-1ac3-4c47-a74e-50fb07ad02e7';
+      newUser.actual_money = 10;
+
       const groups: IGroup[] = await this.groupsRepository.findAll();
 
       if(groups.length == 0) {

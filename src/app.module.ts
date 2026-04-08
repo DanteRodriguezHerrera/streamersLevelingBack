@@ -16,6 +16,8 @@ import { AgendaModule } from './resources/agenda/agenda.module';
 import { Day } from './resources/days/entities/day.entity';
 import { Hour } from './resources/hours/entities/hour.entity';
 import { Agenda } from './resources/agenda/entities/agenda.entity';
+import { RolesModule } from './resources/roles/roles.module';
+import { Role } from './resources/roles/entities/role.entity';
 
 @Module({
   imports: [
@@ -33,7 +35,8 @@ import { Agenda } from './resources/agenda/entities/agenda.entity';
         MoneyHistory,
         Day,
         Hour,
-        Agenda
+        Agenda,
+        Role
       ]
     }),
     UsersModule,
@@ -41,7 +44,8 @@ import { Agenda } from './resources/agenda/entities/agenda.entity';
     MoneyHistoryModule,
     DaysModule,
     HoursModule,
-    AgendaModule
+    AgendaModule,
+    RolesModule
   ],
   controllers: [AppController],
   providers: [AppService],
