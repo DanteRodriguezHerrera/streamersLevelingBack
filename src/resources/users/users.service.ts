@@ -137,6 +137,34 @@ export class UsersService {
     }
   }
 
+  async findByGroup(group_id: string | null) : Promise<UsersResponse> {
+    try {
+      const users = await this.usersRepository.findAll({
+        attributes: [
+          'user_id',
+          'channel_name'
+        ],
+        where: {
+          group_id: group_id
+        }
+      })
+
+      const messageResponse = users.length === 0 ? 'No se encontraron usuarios en este grupo' : 'Se encontraron correctamente todos los usuarios del grupo'
+      
+      return {
+        message: messageResponse,
+        data: users,
+        status: HttpStatus.OK
+      }
+    } catch (error) {
+      return {
+        message: 'Ocurrió un error al encontrar los usuarios',
+        status: HttpStatus.BAD_REQUEST,
+        data: error
+      }
+    }
+  }
+
   async update(user_id: string, updateUserDto: UpdateUserDto) : Promise<UserResponse> {
     try {
       const user = await this.usersRepository.findByPk(user_id);
@@ -205,7 +233,4 @@ export class UsersService {
     }
   }
 
-  async findUser() {
-
-  }
 }

@@ -22,6 +22,11 @@ export class UsersController {
     return this.usersService.findOne(user_id);
   }
 
+  @Get('/byGroup/:group_id')
+  findByGroup(@Param('group_id') group_id: string) {
+    return this.usersService.findByGroup(group_id);
+  }
+
   @Patch(':user_id')
   update(@Param('user_id') user_id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(user_id, updateUserDto);
