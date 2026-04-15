@@ -18,6 +18,7 @@ import { Hour } from './resources/hours/entities/hour.entity';
 import { Agenda } from './resources/agenda/entities/agenda.entity';
 import { RolesModule } from './resources/roles/roles.module';
 import { Role } from './resources/roles/entities/role.entity';
+import { TwitchModule } from './resources/twitch/twitch.module';
 
 @Module({
   imports: [
@@ -45,7 +46,8 @@ import { Role } from './resources/roles/entities/role.entity';
     DaysModule,
     HoursModule,
     AgendaModule,
-    RolesModule
+    RolesModule,
+    TwitchModule
   ],
   controllers: [AppController],
   providers: [AppService],
