@@ -15,6 +15,7 @@ export interface UserResponse {
     message: string;
     data: IUser;
     status: HttpStatus;
+    jwt_token?: string;
 }
 
 export interface UsersResponse {

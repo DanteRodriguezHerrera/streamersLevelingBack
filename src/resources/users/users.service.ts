@@ -1,14 +1,16 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { v4 as uuid } from 'uuid';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
-import { v4 as uuid } from 'uuid';
 
 import { User } from './entities/user.entity';
 import { IUser, UserResponse, UsersResponse } from 'src/interfaces/users.interfaces';
 import { Group } from '../groups/entities/group.entity';
 import { GroupsService } from '../groups/groups.service';
 import { GroupResponse, IGroup } from 'src/interfaces/groups.interfaces';
+import { Role } from '../roles/entities/role.entity';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +18,9 @@ export class UsersService {
   constructor (
     @Inject('USERS_REPOSITORY') private readonly  usersRepository: typeof User,
     @Inject('GROUPS_REPOSITORY') private readonly groupsRepository: typeof Group,
-    private groupsService: GroupsService
+    @Inject('ROLES_REPOSITORY') private readonly rolesRepository: typeof Role,
+    private groupsService: GroupsService,
+    private jwtService: JwtService
   ) {}
 
   async create(createUserDto: CreateUserDto) : Promise<UserResponse> {
@@ -26,7 +30,13 @@ export class UsersService {
         ...createUserDto,
       }
 
-      newUser.role_id = 'c3f283bf-1ac3-4c47-a74e-50fb07ad02e7';
+      const userRole = await this.rolesRepository.findOne({
+        where: {
+          role_name: 'streamer'
+        }
+      });
+
+      newUser.role_id = userRole?.dataValues.role_id;
       newUser.actual_money = 10;
 
       const groups: IGroup[] = await this.groupsRepository.findAll();
@@ -53,12 +63,15 @@ export class UsersService {
         }
       }
 
+      const payload = { role: userRole?.dataValues.role_name }
+
       const user: IUser = await this.usersRepository.create(newUser);
 
       return {
         message: 'Nuevo usuario de twitch registrado',
         data: user,
-        status: HttpStatus.OK
+        status: HttpStatus.OK,
+        jwt_token: await this.jwtService.signAsync(payload)
       }
     } catch (error) {
       return {
@@ -94,18 +107,6 @@ export class UsersService {
   }
 
   async findOne(user_id: string) : Promise<UserResponse> {
-
-    //   async getUser() {
-
-    //   const headers = new Headers()
-
-    //   headers.append('Authorization', 'Bearer eu4qifgzg3xy6hyhh8yzmoe29y4tfc')
-    //   headers.append('client-Id', 'asbp5fyz7toklrqthtkyk6k4i3w9xe')
-
-    //   const response = await fetch('https://api.twitch.tv/helix/users?id=540725944', { headers: headers })
-
-    //   return await response.json();
-    // }
 
     try {
       const user = await this.usersRepository.findByPk(user_id)

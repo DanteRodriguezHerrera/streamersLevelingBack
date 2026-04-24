@@ -5,6 +5,10 @@ import { UsersModule } from './resources/users/users.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ConfigModule } from '@nestjs/config';
 
+import { JwtModule } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './auth/roles.guard';
+
 import { User } from './resources/users/entities/user.entity';
 import { GroupsModule } from './resources/groups/groups.module';
 import { Group } from './resources/groups/entities/group.entity';
@@ -20,9 +24,14 @@ import { RolesModule } from './resources/roles/roles.module';
 import { Role } from './resources/roles/entities/role.entity';
 import { TwitchModule } from './resources/twitch/twitch.module';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET,
+    }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.DB_HOST,
@@ -47,9 +56,14 @@ import { TwitchModule } from './resources/twitch/twitch.module';
     HoursModule,
     AgendaModule,
     RolesModule,
-    TwitchModule
+    TwitchModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    }
+  ],
 })
 export class AppModule { }
