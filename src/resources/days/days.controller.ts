@@ -16,7 +16,7 @@ export class DaysController {
     return this.daysService.create(createDayDto);
   }
 
-  @Roles(Role.Superadmin)
+  @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
   @Get()
   findAll() {
     return this.daysService.findAll();

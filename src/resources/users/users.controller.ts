@@ -33,7 +33,7 @@ export class UsersController {
     return this.usersService.findByGroup(group_id);
   }
 
-  @Roles(Role.Superadmin, Role.Admin)
+  @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
   @Patch(':user_id')
   update(@Param('user_id') user_id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(user_id, updateUserDto);

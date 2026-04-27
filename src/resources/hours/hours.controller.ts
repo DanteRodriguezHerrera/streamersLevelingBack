@@ -16,7 +16,7 @@ export class HoursController {
     return this.hoursService.create(createHourDto);
   }
 
-  @Roles(Role.Superadmin)
+  @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
   @Get()
   findAll() {
     return this.hoursService.findAll();

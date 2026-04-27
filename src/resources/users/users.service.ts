@@ -124,10 +124,20 @@ export class UsersService {
           actual_money: 0
         }
       }
+
+      const userRole = await this.rolesRepository.findOne({
+        where: {
+          role_id: user.dataValues.role_id
+        }
+      });
+
+      const payload = { role: userRole?.dataValues.role_name }
+
       return {
         message: "Usuario encontrado correctamente",
         data: user,
         status: HttpStatus.CREATED,
+        jwt_token: await this.jwtService.signAsync(payload)
       }
     } catch (error) {
       return {
