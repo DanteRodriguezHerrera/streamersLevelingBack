@@ -17,3 +17,9 @@ export interface AgendasResponse {
     data: IAgenda[];
     status: HttpStatus;
 }
+
+export interface SearchLiveStreams {
+  group_id: string;
+  day_name: string;
+  hour_name: string;
+}

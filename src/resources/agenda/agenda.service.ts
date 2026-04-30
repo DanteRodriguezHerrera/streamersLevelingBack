@@ -2,10 +2,11 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateAgendaDto } from './dto/create-agenda.dto';
 import { UpdateAgendaDto } from './dto/update-agenda.dto';
 import { Agenda } from './entities/agenda.entity';
-import { AgendaResponse, AgendasResponse, IAgenda } from 'src/interfaces/agenda.interfaces';
+import { AgendaResponse, SearchLiveStreams } from 'src/interfaces/agenda.interfaces';
 import { User } from '../users/entities/user.entity';
 import { Hour } from '../hours/entities/hour.entity';
 import { Day } from '../days/entities/day.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class AgendaService {
@@ -34,23 +35,68 @@ export class AgendaService {
     }
   }
 
-  async findAll() : Promise<AgendasResponse> {
+  async findTodayStreams(searchLiveStreams: SearchLiveStreams) {
+    const streamsOptions = {
+      attributes: [],
+      include: [
+        {
+          model: User,
+          attributes: [
+            'user_id',
+            'group_id',
+            'channel_name'
+          ],
+          where: {
+            group_id: searchLiveStreams.group_id
+          }
+        },
+        {
+          model: Day,
+          where: {
+            day_name: searchLiveStreams.day_name
+          }
+        },
+        {
+          model: Hour,
+          where: {
+            hour_name: {}
+          },
+        }
+      ],
+    }
+
     try {
-      const agendas = await this.agendaRepository.findAll();
-      if(agendas.length == 0) {
+      streamsOptions.include[2].where.hour_name = {
+        [Op.eq]: searchLiveStreams.hour_name
+      }
+
+      const liveStreams = await this.agendaRepository.findAll(streamsOptions);
+
+      streamsOptions.include[2].where.hour_name = {
+        [Op.gt]: searchLiveStreams.hour_name
+      }
+
+      const scheduledStreams = await this.agendaRepository.findAll(streamsOptions)
+
+      if(liveStreams.length === 0 && scheduledStreams.length === 0) {
         return { 
-          message: 'No hay agendas registradas',
-          data: [],
+          message: 'No hay streams agendados hoy',
+          data: {
+            live: [],
+            scheduled: []
+          },
           status: HttpStatus.NOT_FOUND
         }
       }
 
       return {
-        message: 'Se encontraron las agendas correctamente',
-        data: agendas,
+        message: 'Se encontraron los streams agendados correctamente',
+        data: {
+          live: liveStreams,
+          scheduled: scheduledStreams
+        },
         status: HttpStatus.OK
       }
-
     } catch (error) {
       return {
         message: 'Ocurrió un error buscando las agendas',
@@ -80,10 +126,10 @@ export class AgendaService {
     try {
       const Monday = await this.findByDay(group_id, "Lunes");
       const Tuesday = await this.findByDay(group_id, "Martes");
-      const Wednesday = await this.findByDay(group_id, "Miercoles");
+      const Wednesday = await this.findByDay(group_id, "Miércoles");
       const Thursday = await this.findByDay(group_id, "Jueves");
       const Friday = await this.findByDay(group_id, "Viernes");
-      const Saturday = await this.findByDay(group_id, "Sabado");
+      const Saturday = await this.findByDay(group_id, "Sábado");
 
       const groupAgendas = {
         monday: this.filterDay(Monday),

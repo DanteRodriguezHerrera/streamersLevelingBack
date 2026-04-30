@@ -4,6 +4,7 @@ import { CreateAgendaDto } from './dto/create-agenda.dto';
 import { UpdateAgendaDto } from './dto/update-agenda.dto';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/auth/role.enum';
+import type { SearchLiveStreams } from 'src/interfaces/agenda.interfaces';
 
 @Controller('agenda')
 export class AgendaController {
@@ -17,9 +18,9 @@ export class AgendaController {
   }
 
   @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
-  @Get()
-  findAll() {
-    return this.agendaService.findAll();
+  @Post('todayStreams')
+  findLiveStreams(@Body () searchLiveStreams: SearchLiveStreams) {
+    return this.agendaService.findTodayStreams(searchLiveStreams);
   }
 
   @Roles(Role.Superadmin, Role.Admin, Role.Streamer)

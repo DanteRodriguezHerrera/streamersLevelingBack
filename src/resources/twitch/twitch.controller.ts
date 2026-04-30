@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { TwitchService } from './twitch.service';
 import { tokenResponse } from 'src/interfaces/twitch.interface';
 
@@ -14,6 +14,11 @@ export class TwitchController {
   @Get('/refresh/:refreshToken')
   getNewToken(@Param('refreshToken') refreshToken: string) : Promise<tokenResponse> {
     return this.twitchService.refreshTwitchToken(refreshToken);
+  }
+
+  @Post('/users/:twitchToken')
+  getUsersInfo(@Body('users') users: string[], @Param('twitchToken') twitchToken: string) {
+    return this.twitchService.getUsersInfo(twitchToken, users)
   }
 
 }

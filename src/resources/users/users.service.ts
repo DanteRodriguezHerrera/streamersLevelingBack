@@ -84,7 +84,11 @@ export class UsersService {
 
   async findAll() : Promise<UsersResponse> {
     try {
-      const users = await this.usersRepository.findAll()
+      const users = await this.usersRepository.findAll({
+        order: [
+          ['actual_money', 'DESC']
+        ]
+      })
       
       if(!users) return { 
         message: 'No se encontraron usuarios',
@@ -131,7 +135,7 @@ export class UsersService {
         }
       });
 
-      const payload = { role: userRole?.dataValues.role_name }
+      const payload = { role: userRole?.dataValues.role_name, group: user.dataValues.group_id }
 
       return {
         message: "Usuario encontrado correctamente",
@@ -153,11 +157,15 @@ export class UsersService {
       const users = await this.usersRepository.findAll({
         attributes: [
           'user_id',
-          'channel_name'
+          'channel_name',
+          'actual_money'
         ],
         where: {
           group_id: group_id
-        }
+        },
+        order: [
+          ['actual_money', 'DESC']
+        ]
       })
 
       const messageResponse = users.length === 0 ? 'No se encontraron usuarios en este grupo' : 'Se encontraron correctamente todos los usuarios del grupo'
