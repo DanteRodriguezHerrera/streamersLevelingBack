@@ -85,6 +85,14 @@ export class UsersService {
   async findAll() : Promise<UsersResponse> {
     try {
       const users = await this.usersRepository.findAll({
+        include: [
+          {
+            model: Group
+          },
+          {
+            model: Role
+          }
+        ],
         order: [
           ['actual_money', 'DESC']
         ]
