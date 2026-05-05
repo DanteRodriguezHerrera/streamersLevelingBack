@@ -23,6 +23,8 @@ import { Agenda } from './resources/agenda/entities/agenda.entity';
 import { RolesModule } from './resources/roles/roles.module';
 import { Role } from './resources/roles/entities/role.entity';
 import { TwitchModule } from './resources/twitch/twitch.module';
+import { MoneyReasonsModule } from './resources/money_reasons/money_reasons.module';
+import { MoneyReason } from './resources/money_reasons/entities/money_reason.entity';
 
 
 @Module({
@@ -46,7 +48,8 @@ import { TwitchModule } from './resources/twitch/twitch.module';
         Day,
         Hour,
         Agenda,
-        Role
+        Role,
+        MoneyReason
       ]
     }),
     UsersModule,
@@ -57,6 +60,7 @@ import { TwitchModule } from './resources/twitch/twitch.module';
     AgendaModule,
     RolesModule,
     TwitchModule,
+    MoneyReasonsModule,
   ],
   controllers: [AppController],
   providers: [AppService,
