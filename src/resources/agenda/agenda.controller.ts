@@ -24,18 +24,25 @@ export class AgendaController {
   }
 
   @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
-  @Get('scheduled')
-  findScheduledHours() {
-    return this.agendaService.getScheduledHours('6076c3d4-674d-495c-8098-78e306bc8ebf');
+  @Get('scheduled/:group_id')
+  findScheduledHours(@Param('group_id') group_id: string) {
+    return this.agendaService.getScheduledHours(group_id);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) { 
-  //   return this.agendaService.findOne(+id);
-  // }
+  @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
+  @Get('my-hours/:user_id')
+  findAgendaByUser(@Param('user_id') user_id: string) {
+    return this.agendaService.findByUser(user_id)
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.agendaService.remove(+id);
-  // }
+  @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
+  @Delete('deleteHour/:user_id/:day_id/:hour_id')
+  deleteOneHourScheduled(
+    @Param('user_id') user_id: string,
+    @Param('day_id') day_id: string,
+    @Param('hour_id') hour_id: string
+  ) { 
+    return this.agendaService.deleteOneHourScheduled(user_id, day_id, hour_id);
+  }
+
 }

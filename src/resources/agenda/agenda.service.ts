@@ -1,8 +1,7 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateAgendaDto } from './dto/create-agenda.dto';
-import { UpdateAgendaDto } from './dto/update-agenda.dto';
 import { Agenda } from './entities/agenda.entity';
-import { AgendaResponse, SearchLiveStreams } from 'src/interfaces/agenda.interfaces';
+import { AgendaResponse, AgendasResponse, SearchLiveStreams } from 'src/interfaces/agenda.interfaces';
 import { User } from '../users/entities/user.entity';
 import { Hour } from '../hours/entities/hour.entity';
 import { Day } from '../days/entities/day.entity';
@@ -106,22 +105,6 @@ export class AgendaService {
     }
   }
 
-  // async findOne(id: number) {
-  //   try {
-      
-  //   } catch (error) {
-      
-  //   }
-  // }
-
-  // async remove(id: number) {
-  //   try {
-      
-  //   } catch (error) {
-      
-  //   }
-  // }
-
   async getScheduledHours(group_id: string) {
     try {
       const Monday = await this.findByDay(group_id, "Lunes");
@@ -201,4 +184,84 @@ export class AgendaService {
     return [];
   }
 
+  async findByUser(user_id: string) : Promise<AgendasResponse> {
+    try {
+      const userAgenda = await this.agendaRepository.findAll({
+        attributes: [
+          'user_id'
+        ],
+        where: {
+          user_id: user_id
+        },
+        include: [
+          {
+            model: Day
+          },
+          {
+            model: Hour
+          }
+      ]
+      })
+  
+      if(userAgenda.length === 0) {
+        return {
+          message: 'No se encontraron horas agendadas',
+          data: [],
+          status: HttpStatus.NOT_FOUND
+        }
+      }
+  
+      return {
+        message: 'Se encontraron horas agendadas',
+        data: userAgenda,
+        status: HttpStatus.OK
+      }
+    } catch (error) {
+      console.log(error)
+      return error
+    }
+  }
+
+  async deleteOneHourScheduled(user_id: string, day_id: string, hour_id: string) : Promise<AgendaResponse> {
+    try {
+      const deletedSchedule = await this.agendaRepository.findOne({
+        where: {
+          user_id: user_id,
+          day_id: day_id,
+          hour_id: hour_id
+        },
+        include: [
+          {
+            model: Day
+          },
+          {
+            model: Hour
+          }
+        ]
+      })
+
+      if(!deletedSchedule) {
+        return {
+          message: 'No existe esa hora agendada',
+          data: {
+            user_id: '',
+            day_id: '',
+            hour_id: ''
+          },
+          status: HttpStatus.NOT_FOUND
+        }
+      }
+
+      await deletedSchedule.destroy();
+
+      return {
+        message: 'Se elimino correctamente la hora agendada',
+        data: deletedSchedule,
+        status: HttpStatus.OK
+      }
+    } catch (error) {
+      console.log(error)
+      return error;
+    }
+  }
 }

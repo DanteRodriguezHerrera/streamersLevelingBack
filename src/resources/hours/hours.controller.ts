@@ -22,6 +22,16 @@ export class HoursController {
     return this.hoursService.findAll();
   }
 
+  @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
+  @Get('/no-scheduled/:user_id/:group_id/:day_id')
+  findNoScheduledHours(
+    @Param('user_id') user_id: string, 
+    @Param('group_id') group_id: string, 
+    @Param('day_id') day_id: string
+  ) {
+    return this.hoursService.findNoScheduledHours(user_id, group_id, day_id);
+  }
+
   @Roles(Role.Superadmin)
   @Get(':hour_id')
   findOne(@Param('hour_id') hour_id: string) {

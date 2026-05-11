@@ -48,9 +48,26 @@ export class DaysService {
         }
       }
 
+      const orderDays = [
+        'Lunes',
+        'Martes',
+        'Miércoles',
+        'Jueves',
+        'Viernes',
+        'Sábado'
+      ];
+
+      const orderedDays = days.sort((a, b) => {
+        return orderDays.indexOf(a.day_name) - orderDays.indexOf(b.day_name);
+      });
+
+      const filteredDays = orderedDays.filter(day => {
+        return orderDays.indexOf(day.day_name) >= new Date().getDay() - 1;
+      });
+
       return {
         message: 'Se encontraron correctamente los días',
-        data: days,
+        data: filteredDays,
         status: HttpStatus.OK
       }
     } catch (error) {
