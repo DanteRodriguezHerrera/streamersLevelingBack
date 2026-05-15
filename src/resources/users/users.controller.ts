@@ -28,6 +28,12 @@ export class UsersController {
   }
 
   @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
+  @Get('/byChannelName/:channel_name')
+  findByChannelName(@Param('channel_name') channel_name: string) {
+    return this.usersService.findByChannelName(channel_name)
+  }
+
+  @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
   @Get('/byGroup/:group_id')
   findByGroup(@Param('group_id') group_id: string) {
     return this.usersService.findByGroup(group_id);

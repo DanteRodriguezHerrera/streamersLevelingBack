@@ -23,6 +23,17 @@ export class UsersService {
     private jwtService: JwtService
   ) {}
 
+  emptyUserData: IUser = {
+    user_id: '',
+    twitch_id: '',
+    role_id: '',
+    group_id: null,
+    access_token: '',
+    expires_in: 0,
+    refresh_token: '',
+    actual_money: 0
+  }
+
   async create(createUserDto: CreateUserDto) : Promise<UserResponse> {
     try {
       let newUser: IUser = {
@@ -143,7 +154,11 @@ export class UsersService {
         }
       });
 
-      const payload = { role: userRole?.dataValues.role_name, group: user.dataValues.group_id }
+      const payload = { 
+        role: userRole?.dataValues.role_name, 
+        group: user.dataValues.group_id,
+        name: user.dataValues.channel_name
+      }
 
       return {
         message: "Usuario encontrado correctamente",
@@ -157,6 +172,33 @@ export class UsersService {
         data: error,
         status: HttpStatus.CREATED,
       }
+    }
+  }
+
+  async findByChannelName(channel_name: string) : Promise<UserResponse> {
+    try {
+      const user = await this.usersRepository.findOne({
+        where: {
+          channel_name: channel_name
+        }
+      })
+
+      if(!user) {
+        return {
+          message: 'El streamer no se encuentra registrado en la comunidad',
+          data: this.emptyUserData,
+          status: HttpStatus.NOT_FOUND
+        }
+      }
+
+      return {
+        message: 'Streamer encontrado, iniciando stream',
+        data: user,
+        status: HttpStatus.OK
+      }
+    } catch (error) {
+      console.log(error)
+      return error
     }
   }
 
@@ -198,16 +240,7 @@ export class UsersService {
       if(!user) {
         return {
           message: 'No existe el usuario',
-          data: {
-            user_id: '',
-            twitch_id: '',
-            role_id: '',
-            group_id: null,
-            access_token: '',
-            expires_in: 0,
-            refresh_token: '',
-            actual_money: 0
-          },
+          data: this.emptyUserData,
           status: HttpStatus.NOT_FOUND
         }
       }
@@ -233,16 +266,7 @@ export class UsersService {
         return {
           message: 'No existe el usuario',
           status: HttpStatus.NOT_FOUND,
-          data: {
-            user_id: '',
-            twitch_id: '',
-            role_id: '',
-            group_id: null,
-            access_token: '',
-            expires_in: 0,
-            refresh_token: '',
-            actual_money: 0
-          },
+          data: this.emptyUserData,
         }
       }
       await user.destroy();
