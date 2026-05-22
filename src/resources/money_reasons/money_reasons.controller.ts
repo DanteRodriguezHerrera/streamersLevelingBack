@@ -16,7 +16,7 @@ export class MoneyReasonsController {
     return this.moneyReasonsService.create(createMoneyReasonDto);
   }
 
-  @Roles(Role.Superadmin)
+  @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
   @Get()
   findAll() : Promise<MoneyReasonsResponse> {
     return this.moneyReasonsService.findAll();

@@ -24,28 +24,6 @@ export class MoneyHistoryService {
         ...createMoneyHistoryDto
       }
 
-      const actualMoneyUser: UserResponse = await this.userService.findOne(createMoneyHistoryDto.user_id)
-
-      let newMoney = actualMoneyUser.data.actual_money + createMoneyHistoryDto.quantity;
-
-      if(newMoney < 0) {
-        return {
-          message: 'No tienes suficientes fondos',
-          data: {
-            id_money_history: '',
-            quantity: 0,
-            reason: '',
-            date_money_history: new Date(),
-            user_id: ''
-          },
-          status: HttpStatus.BAD_REQUEST,
-        }
-      }
-
-      await this.userService.update(createMoneyHistoryDto.user_id, {
-        actual_money: newMoney
-      })
-
       const moneyHistory: IMoneyHistory = await this.moneyRepository.create(newMoneyHistory);
 
       return {
