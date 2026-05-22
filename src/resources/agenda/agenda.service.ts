@@ -6,6 +6,7 @@ import { User } from '../users/entities/user.entity';
 import { Hour } from '../hours/entities/hour.entity';
 import { Day } from '../days/entities/day.entity';
 import { Op } from 'sequelize';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class AgendaService {
@@ -262,6 +263,19 @@ export class AgendaService {
     } catch (error) {
       console.log(error)
       return error;
+    }
+  }
+
+  @Cron('0 0 * * 0')
+  async cleanAgenda() {
+    try {
+      console.log("Se limpio la agenda")
+      await this.agendaRepository.destroy({
+        truncate: true
+      })
+    } catch (error) {
+      console.log(error)
+      return error
     }
   }
 }

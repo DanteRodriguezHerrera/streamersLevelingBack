@@ -25,6 +25,7 @@ import { Role } from './resources/roles/entities/role.entity';
 import { TwitchModule } from './resources/twitch/twitch.module';
 import { MoneyReasonsModule } from './resources/money_reasons/money_reasons.module';
 import { MoneyReason } from './resources/money_reasons/entities/money_reason.entity';
+import { ScheduleModule } from '@nestjs/schedule';
 
 
 @Module({
@@ -34,6 +35,7 @@ import { MoneyReason } from './resources/money_reasons/entities/money_reason.ent
       global: true,
       secret: process.env.JWT_SECRET,
     }),
+    ScheduleModule.forRoot(),
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.DB_HOST,
