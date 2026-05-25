@@ -27,7 +27,6 @@ export class UsersController {
     return this.usersService.findOne(user_id);
   }
 
-  @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
   @Get('/byChannelName/:channel_name')
   findByChannelName(@Param('channel_name') channel_name: string) {
     return this.usersService.findByChannelName(channel_name)

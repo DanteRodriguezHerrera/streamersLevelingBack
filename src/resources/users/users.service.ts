@@ -191,10 +191,23 @@ export class UsersService {
         }
       }
 
+      const userRole = await this.rolesRepository.findOne({
+        where: {
+          role_id: user.dataValues.role_id
+        }
+      });
+
+      const payload = { 
+        role: userRole?.dataValues.role_name, 
+        group: user.dataValues.group_id,
+        name: user.dataValues.channel_name
+      }
+
       return {
         message: 'Streamer encontrado, iniciando stream',
         data: user,
-        status: HttpStatus.OK
+        status: HttpStatus.OK,
+        jwt_token: await this.jwtService.signAsync(payload)
       }
     } catch (error) {
       console.log(error)
