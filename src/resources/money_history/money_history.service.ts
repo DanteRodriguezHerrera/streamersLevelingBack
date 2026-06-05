@@ -24,6 +24,9 @@ export class MoneyHistoryService {
         ...createMoneyHistoryDto
       }
 
+      const user = await this.userService.findOne(createMoneyHistoryDto.user_id);
+      this.userService.update(createMoneyHistoryDto.user_id, {actual_money: user.data.actual_money + createMoneyHistoryDto.quantity})
+
       const moneyHistory: IMoneyHistory = await this.moneyRepository.create(newMoneyHistory);
 
       return {
