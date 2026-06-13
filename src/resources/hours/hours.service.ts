@@ -8,13 +8,15 @@ import { v4 as uuid } from 'uuid';
 import { Agenda } from '../agenda/entities/agenda.entity';
 import { Op } from 'sequelize';
 import { User } from '../users/entities/user.entity';
+import { Day } from '../days/entities/day.entity';
 
 @Injectable()
 export class HoursService {
 
   constructor(
     @Inject('HOURS_REPOSITORY') private readonly hoursRepository: typeof Hour,
-    @Inject('AGENDA_REPOSITORY') private readonly agendaRepository: typeof Agenda
+    @Inject('AGENDA_REPOSITORY') private readonly agendaRepository: typeof Agenda,
+    @Inject('DAYS_REPOSITORY') private readonly daysRepository: typeof Day
   ) {}
 
   async create(createHourDto: CreateHourDto) : Promise<HourResponse> {
@@ -74,6 +76,16 @@ export class HoursService {
   }
 
   async findNoScheduledHours(user_id: string, group_id: string, day_id: string) : Promise<HoursResponse> {
+    const now = new Date();
+    const gmt6Date = new Date(
+      now.toLocaleString('en-US', {
+        timeZone: 'America/Mexico_City'
+      })
+    );
+
+    const currentHour = gmt6Date.getHours();
+    const currentHourString = String(currentHour + 1).padStart(2, '0') + ':00';
+
     try {
       const myAgenda = await this.agendaRepository.findAll({
         where: {
@@ -111,12 +123,23 @@ export class HoursService {
 
       myHours.push(...repeatedTwice)
 
+      const dayName = await this.daysRepository.findByPk(day_id);
+
+      const orderDays: Map<string, number> = new Map([
+        ['Lunes', 1],
+        ['Martes', 2],
+        ['Miércoles', 3],
+        ['Jueves', 4],
+        ['Viernes', 5],
+        ['Sábado', 6]
+      ]);
+
+      let whereOption = orderDays.get(dayName?.dataValues.day_name)! > gmt6Date.getDay() ?
+      { hour_id: { [Op.notIn]: myHours } } :
+      { hour_id: { [Op.notIn]: myHours }, hour_name: { [Op.gte]: currentHourString } };
+
       const hours = await this.hoursRepository.findAll({
-        where: {
-          hour_id: {
-            [Op.notIn]: myHours
-          }
-        },
+        where: whereOption,
         order: [
           ['hour_name', 'ASC']
         ]

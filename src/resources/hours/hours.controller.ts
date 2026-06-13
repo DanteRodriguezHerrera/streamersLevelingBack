@@ -23,11 +23,11 @@ export class HoursController {
   }
 
   @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
-  @Get('/no-scheduled/:user_id/:group_id/:day_id')
+  @Post('/no-scheduled')
   findNoScheduledHours(
-    @Param('user_id') user_id: string, 
-    @Param('group_id') group_id: string, 
-    @Param('day_id') day_id: string
+    @Body('user_id') user_id: string, 
+    @Body('group_id') group_id: string, 
+    @Body('day_id') day_id: string,
   ) {
     return this.hoursService.findNoScheduledHours(user_id, group_id, day_id);
   }
