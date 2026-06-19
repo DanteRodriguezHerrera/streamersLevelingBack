@@ -16,5 +16,11 @@ export class Group extends Model {
         type: DataType.STRING({length: 255}),
         allowNull: false
     })
-    declare group_name: string
+    declare group_name: string;
+
+    @Column({
+        type: DataType.STRING({length: 255}),
+        allowNull: false
+    })
+    declare clan_name: string;
 }

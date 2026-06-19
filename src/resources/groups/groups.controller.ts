@@ -30,8 +30,8 @@ export class GroupsController {
 
   @Roles(Role.Superadmin)
   @Patch(':idGroup')
-  update(@Param('idGroup') idGroup: string, @Body() updateGroupDto: UpdateGroupDto) {
-    return this.groupsService.update(idGroup, updateGroupDto);
+  update(@Param('idGroup') idGroup: string, @Body('clanName') clanName: string) {
+    return this.groupsService.update(idGroup, clanName);
   }
 
   @Roles(Role.Superadmin)

@@ -19,7 +19,8 @@ export class GroupsService {
 
     let newGroup: IGroup = {
       group_id: '',
-      group_name: ''
+      group_name: '',
+      clan_name: ''
     }
 
     try {
@@ -80,7 +81,8 @@ export class GroupsService {
           message: 'No existe el grupo',
           data: {
             group_id: '',
-            group_name: ''
+            group_name: '',
+            clan_name: ''
           },
           status: HttpStatus.NOT_FOUND
         }
@@ -100,11 +102,31 @@ export class GroupsService {
     }
   }
 
-  async update(idGroup: string, updateGroupDto: UpdateGroupDto) {
+  async update(idGroup: string, clan_name: string) : Promise<GroupResponse> {
     try {
-      
+      const group = await this.groupsRepository.findByPk(idGroup)
+      if(!group) {
+        return {
+          message: "No existe el grupo",
+          data: {
+            group_id: '',
+            group_name: '',
+            clan_name: ''
+          },
+          status: HttpStatus.NOT_FOUND
+        }
+      }
+
+      await group.update({ clan_name })
+
+      return {
+        message: "Se actualizo el grupo correctamente",
+        data: group,
+        status: HttpStatus.OK
+      }
+
     } catch (error) {
-      
+      return error;
     }
   }
 

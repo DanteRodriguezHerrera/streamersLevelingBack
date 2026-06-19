@@ -3,6 +3,7 @@ import { HttpStatus } from "@nestjs/common";
 export type IGroup = {
     group_id: string;
     group_name: string;
+    clan_name: string
 }
 
 export interface GroupResponse {
