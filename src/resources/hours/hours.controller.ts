@@ -28,8 +28,9 @@ export class HoursController {
     @Body('user_id') user_id: string, 
     @Body('group_id') group_id: string, 
     @Body('day_id') day_id: string,
+    @Body('currentTime') currentTime: string,
   ) {
-    return this.hoursService.findNoScheduledHours(user_id, group_id, day_id);
+    return this.hoursService.findNoScheduledHours(user_id, group_id, day_id, currentTime);
   }
 
   @Roles(Role.Superadmin)

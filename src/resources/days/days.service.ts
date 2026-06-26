@@ -37,7 +37,7 @@ export class DaysService {
     }
   }
 
-  async findAll() : Promise<DaysResponse> {
+  async findAll(currentTime: string) : Promise<DaysResponse> {
     try {
       const days = await this.dayRepository.findAll();
       if(days.length == 0) {
@@ -61,8 +61,22 @@ export class DaysService {
         return orderDays.indexOf(a.day_name) - orderDays.indexOf(b.day_name);
       });
 
+      const cleanTime = currentTime.replace(/\s*\([^)]*\)\s*$/, '').trim();
+      const now = cleanTime ? new Date(cleanTime) : new Date();
+
+      const chihuahuaDay = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Chihuahua',
+        weekday: 'short',
+      }).format(now);
+
+      const dayMap: Record<string, number> = {
+        Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
+      };
+
+      const currentDayIndex = dayMap[chihuahuaDay] ?? now.getDay();
+
       const filteredDays = orderedDays.filter(day => {
-        return orderDays.indexOf(day.day_name) >= new Date().getDay() - 1;
+        return orderDays.indexOf(day.day_name) >= currentDayIndex - 1;
       });
 
       return {

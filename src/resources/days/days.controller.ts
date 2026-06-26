@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { DaysService } from './days.service';
 import { CreateDayDto } from './dto/create-day.dto';
 import { UpdateDayDto } from './dto/update-day.dto';
@@ -17,9 +17,9 @@ export class DaysController {
   }
 
   @Roles(Role.Superadmin, Role.Admin, Role.Streamer)
-  @Get()
-  findAll() {
-    return this.daysService.findAll();
+  @Get(':currentTime')
+  findAll(@Param('currentTime') currentTime: string) {
+    return this.daysService.findAll(currentTime);
   }
 
   @Roles(Role.Superadmin)

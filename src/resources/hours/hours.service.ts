@@ -75,18 +75,34 @@ export class HoursService {
     }
   }
 
-  async findNoScheduledHours(user_id: string, group_id: string, day_id: string) : Promise<HoursResponse> {
-    const now = new Date();
-    const gmt6Date = new Date(
-      now.toLocaleString('en-US', {
-        timeZone: 'America/Mexico_City'
-      })
-    );
-
-    const currentHour = gmt6Date.getHours();
-    const currentHourString = String(currentHour + 1).padStart(2, '0') + ':00';
-
+  async findNoScheduledHours(user_id: string, group_id: string, day_id: string, currentTime: string) : Promise<HoursResponse> {
     try {
+      const cleanTime = currentTime.replace(/\s*\([^)]*\)\s*$/, '').trim();
+      const now = cleanTime ? new Date(cleanTime) : new Date();
+
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Chihuahua',
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+
+      const parts = formatter.formatToParts(now);
+      let weekday = '', hour = '', minute = '';
+      for (const part of parts) {
+        if (part.type === 'weekday') weekday = part.value;
+        if (part.type === 'hour') hour = part.value;
+        if (part.type === 'minute') minute = part.value;
+      }
+
+      const dayMap: Record<string, number> = {
+        Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
+      };
+
+      const chihuahuaDayIndex = dayMap[weekday] ?? now.getDay();
+      const chihuahuaHourString = `${hour}:${minute}`;
+
       const myAgenda = await this.agendaRepository.findAll({
         where: {
           user_id: user_id,
@@ -134,9 +150,9 @@ export class HoursService {
         ['Sábado', 6]
       ]);
 
-      let whereOption = orderDays.get(dayName?.dataValues.day_name)! > gmt6Date.getDay() ?
-      { hour_id: { [Op.notIn]: myHours } } :
-      { hour_id: { [Op.notIn]: myHours }, hour_name: { [Op.gte]: currentHourString } };
+      const whereOption = orderDays.get(dayName?.dataValues.day_name)! > chihuahuaDayIndex
+        ? { hour_id: { [Op.notIn]: myHours } }
+        : { hour_id: { [Op.notIn]: myHours }, hour_name: { [Op.gt]: chihuahuaHourString } };
 
       const hours = await this.hoursRepository.findAll({
         where: whereOption,
