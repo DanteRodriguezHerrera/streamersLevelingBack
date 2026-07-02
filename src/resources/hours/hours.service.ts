@@ -117,6 +117,9 @@ export class HoursService {
       });
 
       const fullHours = await this.agendaRepository.findAll({
+        where: {
+          day_id: day_id
+        },
         include: [
           {
             attributes: [],
